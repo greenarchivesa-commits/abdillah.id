@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>abdillah.com - Catatan & Tulisan</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- DROPDOWN REKOMENDASI SAAT SEARCH DI-FOCUS -->
+                <div id="searchDropdown" class="search-dropdown" style="z-index: 999999;">
+                    <div class="dropdown-header">Hot Topics:</div>
+		    <div id="dynamicHotList"></div>
+                    <div class="dropdown-item" data-query="Menahan Syahwat">↪ Menahan Syahwat</div>
+                    <div class="dropdown-item" data-query="Cara Menjadi Ahlul Quran">↪ Cara Menjadi Ahlul Quran</div>
+                    <div class="dropdown-item" data-query="Ikhtilaf">↪ Ikhtilaf tanaawwu' dan tadhaad</div>
+                    <hr class="dropdown-divider">
+                    <div class="dropdown-item command" data-query="@all"><strong>@all</strong> untuk menampilkan semua artikel</div>
+                    <div class="dropdown-item command" data-query="@new"><strong>@new</strong> untuk menampilkan artikel pekan ini</div>
+                    <div class="dropdown-item command" data-query="@hot"><strong>@hot</strong> untuk menampilkan artikel yg urgen</div>
+                </div>
+
+
+
+    <div class="wrapper" id="mainWrapper">
+        <!-- Header / Logo -->
+        <div class="header-area">
+            <a href="index.html" class="logo">abdillah.com</a>
+        </div>
+
+        <!-- Search Container -->
+        <div class="search-container">
+            <div class="search-wrapper">
+                <input type="text" id="searchBox" class="search-box" placeholder="Cari artikel...">
+                <button class="search-btn" id="searchBtn">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                </button>
+
+<!---->                
+
+            </div>
+
+            <!-- Teks Explore di Bawah Search Bar -->
+            <div class="explore-hint" style="font-size: 14px; margin-top: 10px; text-align: centre;">
+                atau kamu juga bisa <span id="exploreBtn">explore</span>
+            </div>
+        </div>
+
+        <!-- Area Hasil Artikel -->
+        <div class="content-area" id="contentArea">
+            <div class="results-list" id="resultsList"></div>
+            <div id="infoText" class="info-text" style="display: none;">Artikel tidak ditemukan...</div>
+        </div>
+    </div>
+
+    <!-- Floating Bubble Menu -->
+    <div class="floating-container">
+        <div id="floatMenu" class="float-menu">
+            <button id="btnBackToTop">⬆️ Naik ke Atas</button>
+            <button id="btnSwitchTheme">🌓 Ganti Tema</button>
+        </div>
+        <button id="floatBubble" class="float-btn" title="Menu">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        </button>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        const searchBox = document.getElementById('searchBox');
+        const searchDropdown = document.getElementById('searchDropdown');
+        const exploreBtn = document.getElementById('exploreBtn');
+        const resultsList = document.getElementById('resultsList');
+        const infoText = document.getElementById('infoText');
+        const wrapper = document.getElementById('mainWrapper');
+
+        // Render awal kosong / tampilkan beberapa artikel santai
+        function renderArticles(data) {
+            resultsList.innerHTML = '';
+            if (data.length === 0) {
+                infoText.style.display = 'block';
+                return;
+            }
+            infoText.style.display = 'none';
+            
+            data.forEach(item => {
+                const card = document.createElement('a');
+                card.href = item.url;
+                card.className = 'result-item';
+                card.innerHTML = `
+                    ${item.image ? `<img src="${item.image}" class="result-img" alt="Thumbnail">` : ''}
+                    <div class="result-content">
+                        <div class="result-meta">
+                            <span class="badge">${item.badge || 'tulisan'}</span>
+                            <span>${item.date}</span>
+                        </div>
+                        <div class="result-title">${item.title}</div>
+                        <div class="result-caption">${item.caption}</div>
+                    </div>
+                `;
+                resultsList.appendChild(card);
+            });
+        }
+
+        // Logika Filter Pintar (Support @all, @new, @hot, & Keyword)
+        function handleSearch(query) {
+            const q = query.trim().toLowerCase();
+            if (q === '') {
+                wrapper.classList.remove('searched');
+                resultsList.innerHTML = '';
+                return;
+            }
+
+            wrapper.classList.add('searched');
+            searchDropdown.classList.remove('active');
+
+            let filtered = [];
+            if (q === '@all') {
+                filtered = articles; // Munculkan semua buat doom scrolling
+            } else if (q === '@new') {
+                filtered = articles.filter(item => item.badge === 'baru' || item.badge === 'hot');
+            } else if (q === '@hot') {
+                filtered = articles.filter(item => item.badge === 'hot' || item.badge === 'up');
+            } else {
+                filtered = articles.filter(item => 
+                    item.title.toLowerCase().includes(q) || 
+                    item.caption.toLowerCase().includes(q)
+                );
+            }
+            renderArticles(filtered);
+        }
+
+        // Event Input Search Bar
+        searchBox.addEventListener('input', (e) => {
+            handleSearch(e.target.value);
+        });
+
+        // Tampilkan Dropdown saat Search Bar diklik / focus
+        searchBox.addEventListener('focus', () => {
+            searchDropdown.classList.add('active');
+        });
+
+        // Klik tombol Explore -> Otomatis isi "@all" & trigger search
+        exploreBtn.addEventListener('click', () => {
+            searchBox.value = '@all';
+            handleSearch('@all');
+            searchDropdown.classList.remove('active');
+        });
+
+        // Klik item di dalam dropdown rekomendasi
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const val = item.getAttribute('data-query');
+                searchBox.value = val;
+                handleSearch(val);
+            });
+        });
+
+        // Tutup dropdown kalau klik di luar area search box
+        window.addEventListener('click', (e) => {
+            if (!searchBox.contains(e.target) && !searchDropdown.contains(e.target)) {
+                searchDropdown.classList.remove('active');
+            }
+        });
+
+        // Floating Menu & Theme Toggle
+        const floatBubble = document.getElementById('floatBubble');
+        const floatMenu = document.getElementById('floatMenu');
+        floatBubble.addEventListener('click', () => floatMenu.classList.toggle('active'));
+
+        document.getElementById('btnBackToTop').addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            floatMenu.classList.remove('active');
+        });
+
+        document.getElementById('btnSwitchTheme').addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', current);
+            localStorage.setItem('abdullah_theme', current);
+            floatMenu.classList.remove('active');
+        });
+
+        const saved = localStorage.getItem('abdullah_theme');
+        if (saved) document.documentElement.setAttribute('data-theme', saved);
+
+
+// Generate Hot Topics otomatis dari data articles yang ber-badge 'hot'
+const dynamicHotList = document.getElementById('dynamicHotList');
+if (typeof articles !== 'undefined') {
+    const hotArticles = articles.filter(item => item.badge === 'hot');
+    hotArticles.forEach(item => {
+        const div = document.div || document.createElement('div'); // fallback aman
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'dropdown-item';
+        itemDiv.setAttribute('data-query', item.title);
+        itemDiv.innerHTML = `↪ ${item.title}`;
+        
+        // Event klik buat langsung nge-search judul tersebut
+        itemDiv.addEventListener('click', () => {
+            searchBox.value = item.title;
+            handleSearch(item.title);
+        });
+        
+        dynamicHotList.appendChild(itemDiv);
+    });
+}
+
+searchBox.addEventListener('focus', () => {
+    // Ambil posisi kotak search di layar secara akurat
+    const rect = searchBox.getBoundingClientRect();
+    searchDropdown.style.top = (rect.bottom + window.scrollY + 6) + 'px';
+    searchDropdown.style.left = (rect.left + window.scrollX) + 'px';
+    searchDropdown.style.width = rect.width + 'px';
+    
+    searchDropdown.classList.add('active');
+});
+
+    </script>
+</body>
+</html>
