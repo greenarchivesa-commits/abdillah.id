@@ -6,6 +6,31 @@
     <title>abdillah.com - Catatan & Tulisan</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
+<style>
+/* Cara Mematikan Highlighting (Selection) Global, Kecuali Isi Artikel
+Biar pas orang buka pake HP gak sengaja nge-highlight teks tampilan menu/tombol yang malah bikin risih, kita bisa matikan fitur text selection lewat CSS secara global, tapi kita hidupkan khusus untuk area teks artikel (.article-body).
+
+Tambahkan kode CSS ini di bagian paling atas atau bawah file style.css:
+
+CSS */
+
+/* Matikan seleksi teks untuk SELURUH HALAMAN secara default */
+* {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none;    /* IE 10+ */
+    user-select: none;        /* Standard */
+}
+
+/* KECUALI bagian isi artikel, tetap bisa di-highlight / di-copy */
+.article-body, 
+.article-body * {
+    -webkit-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+</style>
+
 <body>
 
 <!-- DROPDOWN REKOMENDASI SAAT SEARCH DI-FOCUS -->
@@ -37,12 +62,14 @@
                     <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
                 </button>
 
+
+
 <!---->                
 
             </div>
 
             <!-- Teks Explore di Bawah Search Bar -->
-            <div class="explore-hint" style="font-size: 14px; margin-top: 10px; text-align: centre;">
+            <div class="explore-hint" style="font-size: 14px; margin-top: 10px; text-align: center;">
                 atau kamu juga bisa <span id="exploreBtn">explore</span>
             </div>
         </div>
@@ -60,9 +87,14 @@
             <button id="btnBackToTop">⬆️ Naik ke Atas</button>
             <button id="btnSwitchTheme">🌓 Ganti Tema</button>
         </div>
-        <button id="floatBubble" class="float-btn" title="Menu">
+      <!--  <button id="floatBubble" class="float-btn" title="Menu">
             <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
-        </button>
+        </button>  -->
+
+<button id="floatBubble" class="float-btn" title="Menu">
+    <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+</button>
+
     </div>
 
     <script src="script.js"></script>
@@ -187,7 +219,10 @@
 // Generate Hot Topics otomatis dari data articles yang ber-badge 'hot'
 const dynamicHotList = document.getElementById('dynamicHotList');
 if (typeof articles !== 'undefined') {
-    const hotArticles = articles.filter(item => item.badge === 'hot');
+   // SEBELUMNYA: const hotArticles = articles.filter(item => item.badge === 'hot');
+    const hotArticles = articles.filter(item => item.badge === 'hot').slice(0, 2);
+                                                       			//SLICE 0,2: berarti maksimal hot item yg di munculin cuma 2 yg dinamis.
+
     hotArticles.forEach(item => {
         const div = document.div || document.createElement('div'); // fallback aman
         const itemDiv = document.createElement('div');
