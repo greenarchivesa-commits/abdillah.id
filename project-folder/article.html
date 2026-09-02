@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memuat Artikel... - abdullah.com</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="article-layout">
+        <!-- Panel Kiri -->
+        <div class="side-panel">
+            <div class="ad-box">
+                <p><strong>CATATAN</strong><br>Sanad & Tulisan</p>
+            </div>
+        </div>
+
+        <!-- Konten Utama -->
+        <div class="article-container">
+            <div class="article-header">
+                <a href="index.html" class="back-link">← Kembali ke Beranda</a>
+                <h1 class="article-title" id="artTitle">Memuat Judul...</h1>
+                <div class="article-date" id="artDate">00 MTH 2026</div>
+            </div>
+
+            <div class="article-body" id="artBody">
+                <p>Sedang memuat isi artikel...</p>
+            </div>
+
+            <!-- Rekomendasi Artikel Lain (Random) -->
+            <div class="recommendations">
+                <div class="rec-title">Tulisan Lainnya</div>
+                <div class="rec-grid" id="recContainer"></div>
+            </div>
+        </div>
+
+        <!-- Panel Kanan (Jump to / Daftar Isi Desktop) -->
+        <div class="side-panel toc-panel">
+            <div class="toc-title">Jump to section</div>
+            <ul class="toc-list" id="tocList"></ul>
+        </div>
+    </div>
+
+    <!-- FULLSCREEN OVERLAY JUMP TO (Animasi Fade Menutup Layar) -->
+    <div id="jumpOverlay" class="jump-overlay">
+        <div class="jump-overlay-content">
+            <div class="jump-overlay-title">Jump to section</div>
+            <ul class="jump-overlay-list" id="jumpOverlayList">
+                <!-- List sub-judul masuk sini secara otomatis -->
+            </ul>
+            <button id="jumpCloseBtn" class="jump-close-btn">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Floating Bubble Menu -->
+    <div class="floating-container">
+        <div id="floatMenu" class="float-menu">
+            <button id="btnTocMobile">📑 Jump to...</button>
+            <button id="btnBackToTop">⬆️ Naik ke Atas</button>
+            <button id="btnSwitchTheme">🌓 Ganti Tema</button>
+        </div>
+        <button id="floatBubble" class="float-btn" title="Menu">
+            <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+        </button>
+    </div>
+
+    <!-- SCRIPT UTAMA -->
+    <script src="articles.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const fileName = urlParams.get('file');
+
+        const artTitle = document.getElementById('artTitle');
+        const artDate = document.getElementById('artDate');
+        const artBody = document.getElementById('artBody');
+        const tocList = document.getElementById('tocList');
+        const recContainer = document.getElementById('recContainer');
+        
+        const jumpOverlay = document.getElementById('jumpOverlay');
+        const jumpOverlayList = document.getElementById('jumpOverlayList');
+        const jumpCloseBtn = document.getElementById('jumpCloseBtn');
+        const btnTocMobile = document.getElementById('btnTocMobile');
+
+        if (fileName) {
+            const script = document.createElement('script');
+            script.src = `articles/${fileName}.js`;
+
+            script.onload = () => {
+                if (window.currentArticleData) {
+                    const current = window.currentArticleData;
+                    artTitle.textContent = current.title;
+                    artDate.textContent = current.date;
+                    artBody.innerHTML = current.content;
+                    document.title = `${current.title} - abdullah.com`;
+
+                    // Generate Table of Contents (Desktop & Overlay Mobile)
+                    const headings = artBody.querySelectorAll('h2');
+                    headings.forEach(h => {
+                        if (!h.id) {
+                            h.id = h.textContent.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                        }
+                        
+                        // Panel Kanan Desktop
+                        const liDesktop = document.createElement('li');
+                        liDesktop.innerHTML = `<a href="#${h.id}">${h.textContent}</a>`;
+                        tocList.appendChild(liDesktop);
+
+                        // Menu Overlay Fullscreen
+                        const liOverlay = document.createElement('li');
+                        liOverlay.innerHTML = `<a href="#${h.id}" class="overlay-link">${h.textContent}</a>`;
+                        jumpOverlayList.appendChild(liOverlay);
+                    });
+
+                    // Klik link di overlay otomatis nutup overlay dan scroll halus
+                    document.querySelectorAll('.overlay-link').forEach(link => {
+                        link.addEventListener('click', () => {
+                            jumpOverlay.classList.remove('active');
+                        });
+                    });
+                }
+            };
+
+            script.onerror = () => {
+                artTitle.textContent = "Artikel Tidak Ditemukan";
+                artBody.innerHTML = "<p>File artikel tidak tersedia.</p>";
+            };
+
+            document.body.appendChild(script);
+        }
+
+        // 2. TULISAN LAINNYA: ACAK (RANDOM) DINAMIS SETIAP REFRESH
+        if (typeof articles !== 'undefined') {
+            // Saring artikel selain yang sedang dibuka
+            let otherArticles = articles.filter(item => item.file !== fileName);
+            
+            // Algoritma Randomize Array (Fisher-Yates Shuffle)
+            otherArticles.sort(() => Math.random() - 0.5);
+
+            // Ambil maksimal 2 artikel acak teratas buat rekomendasi
+            let randomized = otherArticles.slice(0, 2);
+
+            randomized.forEach(item => {
+                const card = document.createElement('a');
+                card.href = `article.html?file=${item.file}`;
+                card.className = 'rec-card';
+                card.innerHTML = `
+                    <div class="rec-card-title">${item.title}</div>
+                    <div class="rec-card-date">${item.date}</div>
+                `;
+                recContainer.appendChild(card);
+            });
+        }
+
+        // 3. KONTROL INTERAKSI & MOBILE RESPONSIVE
+        const floatBubble = document.getElementById('floatBubble');
+        const floatMenu = document.getElementById('floatMenu');
+        
+        floatBubble.addEventListener('click', () => floatMenu.classList.toggle('active'));
+        
+        window.addEventListener('click', (e) => {
+            if (!floatBubble.contains(e.target) && !floatMenu.contains(e.target)) {
+                floatMenu.classList.remove('active');
+            }
+        });
+
+        document.getElementById('btnBackToTop').addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            floatMenu.classList.remove('active');
+        });
+
+        // Buka Fullscreen Overlay Jump To
+        btnTocMobile.addEventListener('click', () => {
+            floatMenu.classList.remove('active');
+            jumpOverlay.classList.add('active');
+        });
+
+        // Tutup Fullscreen Overlay
+        jumpCloseBtn.addEventListener('click', () => {
+            jumpOverlay.classList.remove('active');
+        });
+
+        // Toggle Theme & LocalStorage
+        document.getElementById('btnSwitchTheme').addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', current);
+            localStorage.setItem('abdullah_theme', current);
+            floatMenu.classList.remove('active');
+        });
+
+        const saved = localStorage.getItem('abdullah_theme');
+        if (saved) document.documentElement.setAttribute('data-theme', saved);
+    </script>
+</body>
+</html>

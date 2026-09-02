@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>abdillah.com</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+    </style>
+</head>
+<body>
+
+    <div id="mainWrapper" class="wrapper">
+        <div class="header-area">
+            <a href="#" class="logo" id="homeLogo">abdillah.com</a>
+        </div>
+
+        <div class="search-container">
+            <div class="search-wrapper">
+                <input type="text" id="searchInput" class="search-box" placeholder="Cari artikel..." autofocus>
+                <button id="searchBtn" class="search-btn" title="Cari">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div id="resultsContainer" class="results-list"></div>
+            <div id="infoMessage" class="info-text" style="display: none;">
+                Ketik sesuatu atau klik ikon pencarian untuk mulai mencari artikel.
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Bubble Menu -->
+    <div class="floating-container">
+        <div id="floatMenu" class="float-menu">
+            <button id="btnBackToTop">⬆️ Back to Top</button>
+            <button id="btnSwitchTheme">🌓 Switch Theme</button>
+            <button id="btnShare">🔗 Share Page</button>
+        </div>
+        <button id="floatBubble" class="float-btn" title="Menu">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- LINK KE FILE ARTIKEL TERPISAH -->
+    <script src="script.js"></script>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const infoMessage = document.getElementById('infoMessage');
+        const mainWrapper = document.getElementById('mainWrapper');
+        const homeLogo = document.getElementById('homeLogo');
+
+        const floatBubble = document.getElementById('floatBubble');
+        const floatMenu = document.getElementById('floatMenu');
+        const btnBackToTop = document.getElementById('btnBackToTop');
+        const btnSwitchTheme = document.getElementById('btnSwitchTheme');
+        const btnShare = document.getElementById('btnShare');
+
+        function executeSearch() {
+            const query = searchInput.value.trim();
+            resultsContainer.innerHTML = '';
+
+            if (query === '') {
+                mainWrapper.classList.remove('searched');
+                infoMessage.style.display = 'none';
+                return;
+            }
+
+            mainWrapper.classList.add('searched');
+            infoMessage.style.display = 'none';
+
+            // Variabel 'articles' diambil otomatis dari file articles.js
+            const filtered = articles.filter(item => 
+                item.title.toLowerCase().includes(query.toLowerCase()) || 
+                item.caption.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                resultsContainer.innerHTML = '<div class="info-text" style="margin-top: 20px;">Artikel tidak ditemukan.</div>';
+                return;
+            }
+
+            filtered.forEach(item => {
+                const a = document.createElement('a');
+                a.href = item.url;
+                a.className = 'result-item';
+
+                let imgHtml = item.image ? `<img src="${item.image}" class="result-img" alt="">` : '';
+                let badgeHtml = item.badge ? `<span class="badge">${item.badge}</span>` : '';
+
+                a.innerHTML = `
+                    ${imgHtml}
+                    <div class="result-content">
+                        <div class="result-meta">
+                            ${badgeHtml}
+                            <span>${item.date}</span>
+                        </div>
+                        <div class="result-title">${item.title}</div>
+                        <div class="result-caption">${item.caption}</div>
+                    </div>
+                `;
+                resultsContainer.appendChild(a);
+            });
+        }
+
+        searchBtn.addEventListener('click', executeSearch);
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                executeSearch();
+            }
+        });
+
+        homeLogo.addEventListener('click', (e) => {
+            e.preventDefault();
+            searchInput.value = '';
+            mainWrapper.classList.remove('searched');
+            resultsContainer.innerHTML = '';
+            infoMessage.style.display = 'none';
+        });
+
+        floatBubble.addEventListener('click', () => {
+            floatMenu.classList.toggle('active');
+        });
+
+        window.addEventListener('click', (e) => {
+            if (!floatBubble.contains(e.target) && !floatMenu.contains(e.target)) {
+                floatMenu.classList.remove('active');
+            }
+        });
+
+        btnBackToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            floatMenu.classList.remove('active');
+        });
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('abdullah_theme', theme);
+        }
+
+        btnSwitchTheme.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+            floatMenu.classList.remove('active');
+        });
+
+        const savedTheme = localStorage.getItem('abdullah_theme');
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        } else {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            applyTheme(prefersDark ? 'dark' : 'light');
+        }
+
+        btnShare.addEventListener('click', async () => {
+            floatMenu.classList.remove('active');
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'abdullah.com',
+                        text: 'Baca catatan dan artikel pribadi Abdullah di sini!',
+                        url: window.location.href,
+                    });
+                } catch (err) {
+                    console.log('Share dibatalkan');
+                }
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('Link halaman berhasil disalin ke clipboard!');
+            }
+        });
+    </script>
+</body>
+</html>

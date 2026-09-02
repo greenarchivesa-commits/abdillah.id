@@ -1,0 +1,228 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>Safe Space</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Import Google Fonts (Amiri & Plus Jakarta Sans) -->
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  ::selection { color: white; background: dodgerblue;}
+
+  body {
+    background: #111;
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .ruang-lega {
+    width: 100%;
+    max-width: 600px;
+    padding: 40px;
+  }
+
+  /* Area konten dengan transisi fade */
+  .content-box {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+  }
+
+  .fade-out {
+    opacity: 0;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 30px 0;
+  }
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+    font-size: 28px;
+    line-height: 1.4;
+    color: #ccc;
+  }
+
+  .emoji {
+    flex-shrink: 0;
+  }
+
+  /* Kotak kutipan Arab pakai font Amiri (adem dibaca, tanpa border) */
+  .quote-box {
+    font-family: 'Amiri', serif;
+    font-size: 25px;
+    line-height: 2.3;
+    direction: rtl;
+    text-align: right;
+    padding: 0;
+    margin-bottom: 30px;
+    min-height: 120px;
+  }
+
+  /* Warna Hadith: Putih + Neon (Biru Neon) */
+  .box-hadith {
+    color: #00ffcc;
+  }
+
+  /* Warna Galau/Ayat: Putih + Kuning Emas */
+  .box-galau {
+    color: #ffd700;
+  }
+
+  /* Tombol minimalis */
+  .button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    direction: ltr;
+  }
+
+  button {
+    background: transparent;
+    color: #888;
+    border: 1px solid #333;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  button:hover {
+    color: #fff;
+    border-color: #777;
+    background: #1a1a1a;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="ruang-lega">
+  
+  <div id="dynamicContent" class="content-box">
+    <ul>
+      <li>
+        <span class="emoji">🤲</span>
+        <span>Doa</span>
+      </li>
+      <li>
+        <span class="emoji">🍂</span>
+        <span>Pasrah</span>
+      </li>
+      <li>
+        <span class="emoji">🌌</span>
+        <span>Khauf, Raja, Mahabbah</span>
+      </li>
+    </ul>
+  </div>
+
+  <div class="button-group">
+    <button onclick="tampilkanMenuUtama()">Back</button>
+    <button onclick="tampilkanHadits()">Hadith</button>
+    <button onclick="tampilkanGalau()">Galau / Ayat</button>
+  </div>
+
+</div>
+
+<script>
+  const listHadith = [
+    `مَنْ تَرَكَ شَيْئًا لِلَّهِ، عَوَّضَهُ اللَّهُ خَيْرًا مِنْهُ.<br><span style="font-size: 16px; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif;">(رواه أحمد)</span>`,
+    
+    `إِنَّكَ لَنْ تَدَعَ شَيْئًا لِلَّهِ عَزَّ وَجَلَّ، إِلَّا أَبْدَلَكَ اللَّهُ بِهِ مَا هُوَ خَيْرٌ لَكَ مِنْ ذِلَّكَ.<br><span style="font-size: 16px; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif;">(رواه ابن حبان)</span>`,
+    
+    `ثَلَاثَةٌ حَقٌّ عَلَى اللَّهِ عَوْنُهُمْ... وَالشَّابُّ المُعَفَّ يُرِيدُ العَفَافَ بِمَا أَرادَ اللَّهَ.<br><span style="font-size: 16px; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif;">— Istiqomahlah, antum termasuk golongan yang dijanjikan pertolongan-Nya!</span>`
+  ];
+
+  const listGalau = [
+    `الم ۝ أَحَسِبَ النَّاسُ أَنْ يُتْرَكُوا أَنْ يَقُولُوا آمَنَّا وَهُمْ لَا يُفْتَنُونَ ۝ وَلَقَدْ فَتَنَّا الَّذِينَ مِنْ قَبْلِهِمْ فَلَيَعْلَمَنَّ اللَّهُ الَّذِينَ صَدَقُوا وَلَيَعْلَمَنَّ الْكَاذِبِينَ<br><span style="font-size: 16px; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif;">[العنكبوت: 1-3]</span>`,
+
+    `أَمْ حَسِبْتُمْ أَنْ تَدْخُلُوا الْجَنَّةَ وَلَمَّا يَأْتِكُمْ مَثَلُ الَّذِينَ خَلَوْا مِنْ قَبْلِكُمْ مَسَّتْهُمُ الْبَأْسَاءُ وَالضَّرَّاءُ وَزُلْزِلُوا حَتَّى يَقُولَ الرَّسُولُ وَالَّذِينَ آمَنُوا مَعَهُ مَتَى نَصْرُ اللَّهِ أَلَا إِنَّ نَصْرَ اللَّهِ قَرِيبٌ<br><span style="font-size: 16px; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif;">[البقرة: 214]</span>`,
+
+    `وَعِنْدَهُمْ قَاصِرَاتُ الطَّرْفِ عِينٌ ۝ كَأَنَّهُنَّ بَيْضٌ مَكْنُونٌ... لِمِثْلِ هَذَا فَلْيَعْمَلِ الْعَامِلُونَ ۝ أَذَلِكَ خَيْرٌ نُزُلاً أَمْ شَجَرَةُ الزَّقُّومِ<br><span style="font-size: 16px; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif;">[الصافات: 48-62] — Capeknya nahan syahwat sekarang dibayar setimpal sama kenikmatan ini, bro!</span>`,
+
+    `إِنَّ أَصْحَابَ الْجَنَّةِ الْيَوْمَ فِي شُغُلٍ فَاكِهُونَ ۝ هُمْ وَأَزْوَاجُهُمْ فِي ظِلَالٍ عَلَى الْأَرَائِكِ مُتَّكِئُونَ<br><span style="font-size: 16px; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif;">[يس: 55-56] — Kata para sahabat, mereka sibuk menikmati jamuan‪,‬ layanan‪,‬ dan keindahan tubuh bidadari saking takjubnya!</span>`,
+
+    `<span style="color: #ffd700; font-weight: bold; font-family: 'Amiri', serif;">وَالَّذِينَ جَاهَدُوا فِينَا لَنَهْدِيَنَّهُمْ سُبُلَنَا وَإِنَّ اللَّهَ لَمَعَ الْمَحْسِنِينَ</span><br>
+    <span style="font-size: 16px; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif;">"Dan orang-orang yang berjihad untuk (mencari keridaan) Kami, benar-benar akan Kami tunjukkan kepada mereka jalan-jalan Kami..." Allah membersamai setiap langkah lelah antum, bro!</span>`,
+
+    `<span style="color: #ffd700; font-weight: bold; font-family: 'Amiri', serif;">وَمَا هَذِهِ الْحَيَاةُ الدُّنْيَا إِلَّا لَهْوٌ وَلَعِبٌ وَإِنَّ الدَّارَ الْآخِرَةَ لَهِيَ الْحَيَوَانُ لَوْ كَانُوا يَعْلَمُونَ</span><br>
+    <span style="font-size: 16px; color: #fff; font-family: 'Plus Jakarta Sans', sans-serif;">"Dan kehidupan dunia ini hanya senda gurau dan permainan..." Dunia cuma sebentar, akhirat kekal abadi. Stay strong!</span>`
+  ];
+
+  // Variabel buat nyimpen urutan index sekarang
+  let indexHadith = 0;
+  let indexGalau = 0;
+
+  function gantiDenganEfek(callback) {
+    const box = document.getElementById('dynamicContent');
+    box.classList.add('fade-out');
+    setTimeout(() => {
+      callback();
+      box.classList.remove('fade-out');
+    }, 300);
+  }
+
+  function tampilkanMenuUtama() {
+    gantiDenganEfek(() => {
+      document.getElementById('dynamicContent').innerHTML = `
+        <ul>
+          <li>
+            <span class="emoji">🤲</span>
+            <span>Doa</span>
+          </li>
+          <li>
+            <span class="emoji">🍂</span>
+            <span>Pasrah</span>
+          </li>
+          <li>
+            <span class="emoji">🌌</span>
+            <span>Khauf, Raja, Mahabbah</span>
+          </li>
+        </ul>
+      `;
+    });
+  }
+
+  function tampilkanHadits() {
+    const konten = listHadith[indexHadith];
+    
+    gantiDenganEfek(() => {
+      document.getElementById('dynamicContent').innerHTML = `
+        <div class="quote-box box-hadith">
+          ${konten}
+        </div>
+      `;
+    });
+
+    // Geser ke urutan berikutnya, kalau udah habis balik lagi ke 0 (looping)
+    indexHadith = (indexHadith + 1) % listHadith.length;
+  }
+
+  function tampilkanGalau() {
+    const konten = listGalau[indexGalau];
+    
+    gantiDenganEfek(() => {
+      document.getElementById('dynamicContent').innerHTML = `
+        <div class="quote-box box-galau">
+          ${konten}
+        </div>
+      `;
+    });
+
+    // Geser ke urutan berikutnya, kalau udah habis balik lagi ke 0 (looping)
+    indexGalau = (indexGalau + 1) % listGalau.length;
+  }
+</script>
+
+</body>
+</html>

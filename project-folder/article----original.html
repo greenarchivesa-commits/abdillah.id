@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artikel - abdullah.com</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="article-layout">
+        <!-- Panel Kiri: Ad Space Desktop -->
+        <div class="side-panel">
+            <div class="ad-box">
+                <p><strong>AD SPACE</strong><br>Iklan / Info Bebas</p>
+            </div>
+        </div>
+
+        <!-- Konten Utama Artikel (Max-Width 500px) -->
+        <div class="article-container">
+            <div class="article-header">
+                <a href="index.html" class="back-link">← Kembali ke Beranda</a>
+                <h1 class="article-title" id="artTitle">Memuat Judul...</h1>
+                <div class="article-date" id="artDate">00 MTH 2026</div>
+            </div>
+
+            <div class="article-body" id="artBody">
+                <!-- Isi Artikel Masuk Sini Otomatis -->
+            </div>
+
+            <!-- Rekomendasi Artikel Lain -->
+            <div class="recommendations">
+                <div class="rec-title">Rekomendasi Artikel Lain</div>
+                <div class="rec-grid" id="recContainer">
+                    <!-- List Artikel Lain Muncul Otomatis -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Kanan: Table of Contents (Desktop) -->
+        <div class="side-panel toc-panel">
+            <div class="toc-title">Jump to section</div>
+            <ul class="toc-list" id="tocList">
+                <!-- Daftar Sub-bab Muncul Otomatis -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- Floating Bubble Menu (Buat Mobile & Kontrol Tema) -->
+    <div class="floating-container">
+        <div id="floatMenu" class="float-menu">
+            <button id="btnTocMobile">📑 Jump to...</button>
+            <button id="btnBackToTop">⬆️ Back to Top</button>
+            <button id="btnSwitchTheme">🌓 Switch Theme</button>
+            <button id="btnShare">🔗 Share Page</button>
+        </div>
+        <button id="floatBubble" class="float-btn" title="Menu">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Load Data & Script Render -->
+    <script src="articles.js"></script>
+    <script src="article-data.js"></script>
+    <script>
+        // Tangkap parameter ID dari URL (Contoh: article.html?id=1)
+        const urlParams = new URLSearchParams(window.location.search);
+        const articleId = urlParams.get('id');
+
+        const artTitle = document.getElementById('artTitle');
+        const artDate = document.getElementById('artDate');
+        const artBody = document.getElementById('artBody');
+        const tocList = document.getElementById('tocList');
+        const recContainer = document.getElementById('recContainer');
+
+        if (articleId && articleDatabase[articleId]) {
+            const current = articleDatabase[articleId];
+            artTitle.textContent = current.title;
+            artDate.textContent = current.date;
+            artBody.innerHTML = current.content;
+            document.title = `${current.title} - abdullah.com`;
+
+            // Otomatis generate Jump to (Table of Contents) dari tag <h2> di dalam artikel
+            const headings = artBody.querySelectorAll('h2');
+            headings.forEach(h => {
+                if (!h.id) {
+                    h.id = h.textContent.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                }
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="#${h.id}">${h.textContent}</a>`;
+                tocList.appendChild(li);
+            });
+        } else {
+            artTitle.textContent = "Artikel Tidak Ditemukan";
+            artBody.innerHTML = "<p>Maaf, artikel yang kamu cari tidak ada atau sudah dihapus.</p>";
+        }
+
+        // Generate Rekomendasi Artikel Lain (Ambil dari articles.js kecuali artikel yang sedang dibuka)
+        if (typeof articles !== 'undefined') {
+            const otherArticles = articles.filter(item => item.id !== articleId);
+            otherArticles.forEach(item => {
+                const card = document.createElement('a');
+                card.href = `article.html?id=${item.id}`;
+                card.className = 'rec-card';
+                card.innerHTML = `
+                    <div class="rec-card-title">${item.title}</div>
+                    <div class="rec-card-date">${item.date}</div>
+                `;
+                recContainer.appendChild(card);
+            });
+        }
+
+        // Script Floating Bubble & Theme Manager (Sama kayak beranda)
+        const floatBubble = document.getElementById('floatBubble');
+        const floatMenu = document.getElementById('floatMenu');
+        const btnBackToTop = document.getElementById('btnBackToTop');
+        const btnSwitchTheme = document.getElementById('btnSwitchTheme');
+        const btnShare = document.getElementById('btnShare');
+        const btnTocMobile = document.getElementById('btnTocMobile');
+
+        floatBubble.addEventListener('click', () => floatMenu.classList.toggle('active'));
+        window.addEventListener('click', (e) => {
+            if (!floatBubble.contains(e.target) && !floatMenu.contains(e.target)) {
+                floatMenu.classList.remove('active');
+            }
+        });
+
+        btnBackToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            floatMenu.classList.remove('active');
+        });
+
+        // Tombol Jump to khusus mobile di bubble menu
+        btnTocMobile.addEventListener('click', () => {
+            floatMenu.classList.remove('active');
+            const firstHeading = artBody.querySelector('h2');
+            if (firstHeading) {
+                firstHeading.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('abdullah_theme', theme);
+        }
+
+        btnSwitchTheme.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+            floatMenu.classList.remove('active');
+        });
+
+        const savedTheme = localStorage.getItem('abdullah_theme');
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        } else {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            applyTheme(prefersDark ? 'dark' : 'light');
+        }
+
+        btnShare.addEventListener('click', async () => {
+            floatMenu.classList.remove('active');
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: document.title, url: window.location.href });
+                } catch (err) {}
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('Link artikel berhasil disalin!');
+            }
+        });
+    </script>
+</body>
+</html>
