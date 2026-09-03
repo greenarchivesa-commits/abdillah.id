@@ -55,7 +55,7 @@ const articles = [
         caption: "Sekilas tentang pengalaman pribadi menyikapi fitrah.",
         badge: "hot",
 	    tags: ["Hakekat", "Refleksi"],
-        image: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80",
+        image: "https://images.unsplash.com/photo-1716732787682-1b45001082e2?auto=format&fit=crop&w=300&q=80",
         file: "artikel-kode-004",
         url: "article.html?file=artikel-kode-004"
     }

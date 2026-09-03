@@ -10,10 +10,17 @@ window.currentArticleData = {
             
             <h2 id="settings">1. Content.</h2>
             <p>Karena konten ini agak panjang, admin akan mencantumkan file PDF-nya dibawah.</p>
-            <a href="" style="text-decoration: none; font-size: 25px; padding: 7px; padding-left: 14px; padding-right: 14px; background: dodgerblue; border-radius: 9px; box-shadow: 1px 10px 6px rgb(0,0,0,0.5);">Download</a>
+            <a href="" style="text-decoration: none; color: white; text-shadow: 1px 1px 10px white; font-size: 25px; padding: 7px; padding-left: 14px; padding-right: 14px; background: dodgerblue; border-radius: 9px; box-shadow: 1px 4px 3px rgb(0,0,0,0.3);">Download</a>
 
             <h2 id="shortcuts">2. License.</h2>
             <p>MIT. <a href="https://www.google.com/search?q=What%20is%20mit%20license?">Click for more info..</a></p>
+
+           <div> Kuncup Bunga yang Belum Mekar – Simbol Menahan Diri & Menunggu Waktu Terbaik
+<li>Filosofinya: Bunga yang masih menguncup sedang melindungi mahkotanya yang berharga dari cuaca luar, sampai waktunya mekar dengan indah pada saat yang tepat.</li>
+<li>Sebab cocok buat remaja: Ini metafora dari menahan syahwat. Remaja yang menjaga dirinya sedang "menguncup" (menyimpan keindahannya), dan kelak akan "mekar" sempurna setelah menikah (pahalanya).</li>
+<li>Keyword PNG: flower bud vector png, rose bud aesthetic png.</li>
+</div>
+
     `
 };
 
