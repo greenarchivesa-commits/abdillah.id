@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Halaman Tersesat | abdillah.id</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #0B0F19;
+            color: #F3F4F6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Canvas Animasi Background Partikel/Bintang */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .error-code {
+            font-family: 'Space Mono', monospace;
+            font-size: clamp(5rem, 20vw, 7.5rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #2DD4BF 0%, #0D9488 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(13, 148, 136, 0.1);
+            color: #2DD4BF;
+            border: 1px solid rgba(13, 148, 136, 0.3);
+            padding: 0.35rem 0.85rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        h1 {
+            font-size: clamp(1.35rem, 5vw, 1.65rem);
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            color: #FFFFFF;
+        }
+
+        p {
+            color: #9CA3AF;
+            font-size: clamp(0.9rem, 3vw, 0.95rem);
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            padding: 0 0.5rem;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            width: 100%;
+            padding: 0 1rem;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0.85rem 1.25rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #0D9488;
+            color: #FFFFFF;
+            box-shadow: 0 4px 14px rgba(13, 148, 136, 0.4);
+        }
+
+        .btn-primary:hover {
+            background: #0F766E;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #F3F4F6;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .footer-info {
+            margin-top: 2.5rem;
+            font-size: 0.8rem;
+            color: #6B7280;
+            padding: 0 1rem;
+        }
+
+        .footer-info a {
+            color: #2DD4BF;
+            text-decoration: none;
+        }
+
+        .footer-info a:hover {
+            text-decoration: underline;
+        }
+
+        @media (min-width: 480px) {
+            .btn-group {
+                flex-direction: row;
+                justify-content: center;
+                padding: 0;
+            }
+
+            .btn {
+                width: auto;
+                padding: 0.75rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Canvas buat animasi background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="container">
+        <div class="badge">Error 404 • Sinyal Hilang</div>
+        <div class="error-code">404</div>
+        <h1>Halaman Tidak Ditemukan</h1>
+        <p>Waduh, kamu kesasar ke dimensi lain yang belum ada kodenya di <strong style="color: #FFFFFF;">abdillah.id</strong>. Mending balik kanan, bro!</p>
+        
+        <div class="btn-group">
+            <a href="/" class="btn btn-primary">Kembali ke Beranda</a>
+            <a href="mailto:green.archive.sa@gmail.com" class="btn btn-secondary">Kontak Email</a>
+        </div>
+
+        <div class="footer-info">
+            abdillah.id &bull; Butuh bantuan? Email ke <a href="mailto:green.archive.sa@gmail.com">green.archive.sa@gmail.com</a>
+        </div>
+    </div>
+
+    <script>
+        // Script JavaScript buat bikin animasi partikel bintang bergerak di background
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let particlesArray;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.opacity = Math.random() * 0.5 + 0.2;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width) this.x = 0;
+                else if (this.x < 0) this.x = canvas.width;
+
+                if (this.y > canvas.height) this.y = 0;
+                else if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(45, 212, 191, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            const numberOfParticles = Math.floor((canvas.width * canvas.height) / 9000);
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        initParticles();
+        animate();
+    </script>
+</body>
+</html>
