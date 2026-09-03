@@ -29,6 +29,95 @@ CSS */
     -ms-user-select: text;
     user-select: text;
 }
+
+
+/* STYLING TAG YANG TOMBOLNYA DI SEKITAR CEARCH BAR  */
+.category-filters {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin: 15px 0 25px 0;
+    flex-wrap: wrap;
+}
+
+.chip {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.chip:hover, .chip.active {
+    background: var(--text-color);
+    color: var(--bg-color);
+    border-color: var(--text-color);
+}
+
+/* BIAR TAGS NNYA BISA DI GESER KALAU HP */
+
+.category-filters {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-start; /* Rata kiri biar gampang di-swipe dari awal */
+    margin: 15px 0 25px 0;
+    overflow-x: auto;          /* Bikin bisa digeser ke samping */
+    white-space: nowrap;       /* Larang teks chip turun baris */
+    padding-bottom: 6px;       /* Ruang sikit buat scrollbar tipis */
+    -webkit-overflow-scrolling: touch; /* Supaya smooth di HP */
+}
+
+/* Sembunyikan scrollbar bawaan biar tetap kelihatan minimalis */
+.category-filters::-webkit-scrollbar {
+    display: none;             
+}
+.category-filters {
+    scrollbar-width: none;     /* Untuk Firefox */
+}
+
+.chip {
+    flex-shrink: 0;            /* Cegah chip ikut gepeng/penyok pas layarnya kecil */
+}
+
+
+/* KODE BARU */
+
+.category-filters {
+    display: flex;
+    gap: 8px;
+    margin: 15px 0 25px 0;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    
+    /* Trik biar di layar lebar dia di tengah, tapi di HP bisa digeser rata kiri */
+    justify-content: center; 
+}
+
+/* Kalau di HP (layar kecil), otomatis paksa rata kiri biar gak aneh posisinya */
+@media (max-width: 768px) {
+    .category-filters {
+        justify-content: flex-start;
+        padding-left: 16px; /* Kasih jarak sikit dari pinggir layar HP */
+        padding-right: 16px;
+    }
+}
+
+.category-filters::-webkit-scrollbar {
+    display: none;
+}
+.category-filters {
+    scrollbar-width: none;
+}
+
+.chip {
+    flex-shrink: 0;
+}
+
 </style>
 
 <body>
@@ -68,11 +157,23 @@ CSS */
 
             </div>
 
+<!-- Kategori Filter Chips -->
+<div class="category-filters" id="categoryFilters">
+    <button class="chip active" data-cat="all">Semua</button>
+    <button class="chip" data-cat="Coding">Coding</button>
+    <button class="chip" data-cat="Teknologi">Teknologi</button>
+    <button class="chip" data-cat="Refleksi">Refleksi</button>
+    <button class="chip" data-cat="Catatan">Catatan</button>
+    <button class="chip" data-cat="Fikih">Fikih</button>
+</div> <br>
+
             <!-- Teks Explore di Bawah Search Bar -->
             <div class="explore-hint" style="font-size: 14px; margin-top: 10px; text-align: center;">
                 atau kamu juga bisa <span id="exploreBtn">explore</span>
             </div>
         </div>
+
+
 
         <!-- Area Hasil Artikel -->
         <div class="content-area" id="contentArea">
@@ -248,6 +349,35 @@ searchBox.addEventListener('focus', () => {
     searchDropdown.style.width = rect.width + 'px';
     
     searchDropdown.classList.add('active');
+});
+
+
+// TAG FILTER
+
+// Logika Filter Berdasarkan Kategori Chip
+// Pastikan variabel chips dipanggil setelah dokumen siap
+const chips = document.querySelectorAll('.chip');
+
+chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+        // 1. Bersihkan semua kelas active
+        chips.forEach(c => c.classList.remove('active'));
+        // 2. Tandai chip yang sedang ditekan
+        chip.classList.add('active');
+
+        const selectedTag = chip.getAttribute('data-cat');
+        wrapper.classList.add('searched');
+
+        if (selectedTag === 'all') {
+            renderArticles(articles);
+        } else {
+            // 3. Filter aman dengan pengecekan array tags
+            const filtered = articles.filter(item => 
+                item.tags && item.tags.includes(selectedTag)
+            );
+            renderArticles(filtered);
+        }
+    });
 });
 
     </script>
