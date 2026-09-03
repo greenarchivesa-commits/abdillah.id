@@ -70,8 +70,8 @@ CSS */
             </div>
 
 
-	    <!-- CHAT & FORUM -->
-<section class="comments-section" style="margin-top: 40px; padding: 2ch; padding-top: 20px; border-top: 1px solid var(--border-color); margin-bottom: 30px; border-radius: 10px; background: none;">
+	    <!-- CHAT & FORUM 
+<section class="comments-section" style="margin-top: 40px; padding: 2ch; padding-top: 20px; border-top: 1px solid var(--border-color); margin-bottom: 30px; border-radius: 10px; background: #222;">
     <h3>Komentar & Diskusi</h3> 
     <br><br>
 <script src="https://giscus.app/client.js"
@@ -84,12 +84,114 @@ CSS */
         data-reactions-enabled="1"
         data-emit-metadata="1"
         data-input-position="top"
-        data-theme="light"
+        data-theme="transparent_dark"
         data-lang="id"
         crossorigin="anonymous"
         async>
 </script>
+</section> -->
+
+<!-- CHAT & FORUM -->
+<section class="comments-section" style="position: relative; margin-top: 40px; padding: 2ch; padding-top: 20px; border-top: 1px solid var(--border-color); margin-bottom: 30px; border-radius: 10px; background: #0B0F19; overflow: hidden;">
+    
+    <!-- Canvas Animasi Background Teal -->
+    <canvas id="giscus-bg-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;"></canvas>
+
+    <!-- Wrapper Biar Konten & Giscus Ada di Atas Animasi -->
+    <div style="position: relative; z-index: 1;">
+        <h3 style="color: #F3F4F6;">Komentar & Diskusi</h3> 
+        <br><br>
+        <script src="https://giscus.app/client.js"
+                data-repo="greenarchivesa-commits/abdillah.id"
+                data-repo-id="R_kgDOUL2u_A"
+                data-category="General"
+                data-category-id="DIC_kwDOUL2u_M4DEw-X"
+                data-mapping="pathname"
+                data-strict="0"
+                data-reactions-enabled="1"
+                data-emit-metadata="1"
+                data-input-position="top"
+                data-theme="transparent_dark"
+                data-lang="id"
+                crossorigin="anonymous"
+                async>
+        </script>
+    </div>
 </section>
+
+<!-- Skrip JavaScript Animasi Partikel -->
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const canvas = document.getElementById('giscus-bg-canvas');
+        const ctx = canvas.getContext('2d');
+        const section = canvas.parentElement;
+
+        let particlesArray = [];
+
+        function resizeCanvas() {
+            canvas.width = section.offsetWidth;
+            canvas.height = section.offsetHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.3;
+                this.speedY = (Math.random() - 0.5) * 0.3;
+                this.opacity = Math.random() * 0.4 + 0.15;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width) this.x = 0;
+                else if (this.x < 0) this.x = canvas.width;
+
+                if (this.y > canvas.height) this.y = 0;
+                else if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(45, 212, 191, ${this.opacity})`; // Warna Teal khas
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            const numberOfParticles = Math.floor((canvas.width * canvas.height) / 10000);
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animate() {
+            // Update tinggi canvas dinamis kalau Giscus-nya udah load/panjang
+            if (canvas.height !== section.offsetHeight) {
+                canvas.height = section.offsetHeight;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        setTimeout(() => {
+            resizeCanvas();
+            initParticles();
+            animate();
+        }, 500);
+    });
+</script>
 
 <!-- Tempat penampung komentar -->
 <div id="giscus-container"></div>
