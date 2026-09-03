@@ -171,144 +171,138 @@ CSS */
 
     <script src="script.js"></script>
     <script>
-const searchBox = document.getElementById('searchBox');
-const searchDropdown = document.getElementById('searchDropdown');
-const exploreBtn = document.getElementById('exploreBtn');
-const resultsList = document.getElementById('resultsList');
-const infoText = document.getElementById('infoText');
-const wrapper = document.getElementById('mainWrapper');
+        const searchBox = document.getElementById('searchBox');
+        const searchDropdown = document.getElementById('searchDropdown');
+        const exploreBtn = document.getElementById('exploreBtn');
+        const resultsList = document.getElementById('resultsList');
+        const infoText = document.getElementById('infoText');
+        const wrapper = document.getElementById('mainWrapper');
 
-// Render artikel dengan pembatas (limit max 20 item) & DocumentFragment biar gak makan RAM
-function renderArticles(data) {
-    resultsList.innerHTML = '';
-    if (data.length === 0) {
-        infoText.style.display = 'block';
-        return;
-    }
-    infoText.style.display = 'none';
-    
-    // Batasi maksimal 20 item per render biar gak berat/lag (Doom scrolling aman)
-    const maxDisplay = 20;
-    const limitedData = data.slice(0, maxDisplay);
-    const fragment = document.createDocumentFragment();
+        // Render awal kosong / tampilkan beberapa artikel santai
+        function renderArticles(data) {
+            resultsList.innerHTML = '';
+            if (data.length === 0) {
+                infoText.style.display = 'block';
+                return;
+            }
+            infoText.style.display = 'none';
+            
+            data.forEach(item => {
+                const card = document.createElement('a');
+                card.href = item.url;
+                card.className = 'result-item';
+                card.innerHTML = `
+                    ${item.image ? `<img src="${item.image}" class="result-img" alt="Thumbnail">` : ''}
+                    <div class="result-content">
+                        <div class="result-meta">
+                            <span class="badge">${item.badge || 'tulisan'}</span>
+                            <span>${item.date}</span>
+                        </div>
+                        <div class="result-title">${item.title}</div>
+                        <div class="result-caption">${item.caption}</div>
+                    </div>
+                `;
+                resultsList.appendChild(card);
+            });
+        }
 
-    limitedData.forEach(item => {
-        const card = document.createElement('a');
-        card.href = item.url;
-        card.className = 'result-item';
-        card.innerHTML = `
-            ${item.image ? `<img src="${item.image}" class="result-img" alt="Thumbnail" loading="lazy">` : ''}
-            <div class="result-content">
-                <div class="result-meta">
-                    <span class="badge">${item.badge || 'tulisan'}</span>
-                    <span>${item.date}</span>
-                </div>
-                <div class="result-title">${item.title}</div>
-                <div class="result-caption">${item.caption}</div>
-            </div>
-        `;
-        fragment.appendChild(card);
-    });
+        // Logika Filter Pintar (Support @all, @new, @hot, & Keyword)
+        function handleSearch(query) {
+            const q = query.trim().toLowerCase();
+            if (q === '') {
+                wrapper.classList.remove('searched');
+                resultsList.innerHTML = '';
+                return;
+            }
 
-    resultsList.appendChild(fragment);
-}
+            wrapper.classList.add('searched');
+            searchDropdown.classList.remove('active');
 
-// Logika Filter Pintar
-function handleSearch(query) {
-    const q = query.trim().toLowerCase();
-    if (q === '') {
-        wrapper.classList.remove('searched');
-        resultsList.innerHTML = '';
-        return;
-    }
+            let filtered = [];
+            if (q === '@all') {
+                filtered = articles; // Munculkan semua buat doom scrolling
+            } else if (q === '@new') {
+                filtered = articles.filter(item => item.badge === 'baru' || item.badge === 'hot');
+            } else if (q === '@hot') {
+                filtered = articles.filter(item => item.badge === 'hot' || item.badge === 'up');
+            } else {
+                filtered = articles.filter(item => 
+                    item.title.toLowerCase().includes(q) || 
+                    item.caption.toLowerCase().includes(q)
+                );
+            }
+            renderArticles(filtered);
+        }
 
-    wrapper.classList.add('searched');
-    searchDropdown.classList.remove('active');
+        // Event Input Search Bar
+        searchBox.addEventListener('input', (e) => {
+            handleSearch(e.target.value);
+        });
 
-    let filtered = [];
-    if (q === '@all') {
-        filtered = typeof articles !== 'undefined' ? articles : [];
-    } else if (q === '@new') {
-        filtered = articles.filter(item => item.badge === 'baru' || item.badge === 'hot');
-    } else if (q === '@hot') {
-        filtered = articles.filter(item => item.badge === 'hot' || item.badge === 'up');
-    } else {
-        filtered = articles.filter(item => 
-            item.title.toLowerCase().includes(q) || 
-            item.caption.toLowerCase().includes(q)
-        );
-    }
-    renderArticles(filtered);
-}
+        // Tampilkan Dropdown saat Search Bar diklik / focus
+        searchBox.addEventListener('focus', () => {
+            searchDropdown.classList.add('active');
+        });
 
-// Event Input Search Bar
-searchBox.addEventListener('input', (e) => {
-    handleSearch(e.target.value);
-});
+        // Klik tombol Explore -> Otomatis isi "@all" & trigger search
+        exploreBtn.addEventListener('click', () => {
+            searchBox.value = '@all';
+            handleSearch('@all');
+            searchDropdown.classList.remove('active');
+        });
 
-// Tampilkan Dropdown
-searchBox.addEventListener('focus', () => {
-    const rect = searchBox.getBoundingClientRect();
-    searchDropdown.style.top = (rect.bottom + window.scrollY + 6) + 'px';
-    searchDropdown.style.left = (rect.left + window.scrollX) + 'px';
-    searchDropdown.style.width = rect.width + 'px';
-    searchDropdown.classList.add('active');
-});
+        // Klik item di dalam dropdown rekomendasi
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const val = item.getAttribute('data-query');
+                searchBox.value = val;
+                handleSearch(val);
+            });
+        });
 
-// Klik tombol Explore
-exploreBtn.addEventListener('click', () => {
-    searchBox.value = '@all';
-    handleSearch('@all');
-    searchDropdown.classList.remove('active');
-});
+        // Tutup dropdown kalau klik di luar area search box
+        window.addEventListener('click', (e) => {
+            if (!searchBox.contains(e.target) && !searchDropdown.contains(e.target)) {
+                searchDropdown.classList.remove('active');
+            }
+        });
 
-// Klik item di dalam dropdown rekomendasi
-document.querySelectorAll('.dropdown-item').forEach(item => {
-    item.addEventListener('click', () => {
-        const val = item.getAttribute('data-query');
-        searchBox.value = val;
-        handleSearch(val);
-    });
-});
+        // Floating Menu & Theme Toggle
+        const floatBubble = document.getElementById('floatBubble');
+        const floatMenu = document.getElementById('floatMenu');
+        floatBubble.addEventListener('click', () => floatMenu.classList.toggle('active'));
 
-// Tutup dropdown kalau klik di luar
-window.addEventListener('click', (e) => {
-    if (!searchBox.contains(e.target) && !searchDropdown.contains(e.target)) {
-        searchDropdown.classList.remove('active');
-    }
-});
+        document.getElementById('btnBackToTop').addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            floatMenu.classList.remove('active');
+        });
 
-// Floating Menu & Theme Toggle
-const floatBubble = document.getElementById('floatBubble');
-const floatMenu = document.getElementById('floatMenu');
-floatBubble.addEventListener('click', () => floatMenu.classList.toggle('active'));
+        document.getElementById('btnSwitchTheme').addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', current);
+            localStorage.setItem('abdullah_theme', current);
+            floatMenu.classList.remove('active');
+        });
 
-document.getElementById('btnBackToTop').addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    floatMenu.classList.remove('active');
-});
+        const saved = localStorage.getItem('abdullah_theme');
+        if (saved) document.documentElement.setAttribute('data-theme', saved);
 
-document.getElementById('btnSwitchTheme').addEventListener('click', () => {
-    const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', current);
-    localStorage.setItem('abdullah_theme', current);
-    floatMenu.classList.remove('active');
-});
 
-const saved = localStorage.getItem('abdullah_theme');
-if (saved) document.documentElement.setAttribute('data-theme', saved);
-
-// Generate Hot Topics otomatis
+// Generate Hot Topics otomatis dari data articles yang ber-badge 'hot'
 const dynamicHotList = document.getElementById('dynamicHotList');
-if (typeof articles !== 'undefined' && dynamicHotList) {
+if (typeof articles !== 'undefined') {
+   // SEBELUMNYA: const hotArticles = articles.filter(item => item.badge === 'hot');
     const hotArticles = articles.filter(item => item.badge === 'hot').slice(0, 2);
+                                                       			//SLICE 0,2: berarti maksimal hot item yg di munculin cuma 2 yg dinamis.
 
     hotArticles.forEach(item => {
+        const div = document.div || document.createElement('div'); // fallback aman
         const itemDiv = document.createElement('div');
         itemDiv.className = 'dropdown-item';
         itemDiv.setAttribute('data-query', item.title);
         itemDiv.innerHTML = `↪ ${item.title}`;
         
+        // Event klik buat langsung nge-search judul tersebut
         itemDiv.addEventListener('click', () => {
             searchBox.value = item.title;
             handleSearch(item.title);
@@ -318,11 +312,28 @@ if (typeof articles !== 'undefined' && dynamicHotList) {
     });
 }
 
+searchBox.addEventListener('focus', () => {
+    // Ambil posisi kotak search di layar secara akurat
+    const rect = searchBox.getBoundingClientRect();
+    searchDropdown.style.top = (rect.bottom + window.scrollY + 6) + 'px';
+    searchDropdown.style.left = (rect.left + window.scrollX) + 'px';
+    searchDropdown.style.width = rect.width + 'px';
+    
+    searchDropdown.classList.add('active');
+});
+
+
 // TAG FILTER
+
+// Logika Filter Berdasarkan Kategori Chip
+// Pastikan variabel chips dipanggil setelah dokumen siap
 const chips = document.querySelectorAll('.chip');
+
 chips.forEach(chip => {
     chip.addEventListener('click', () => {
+        // 1. Bersihkan semua kelas active
         chips.forEach(c => c.classList.remove('active'));
+        // 2. Tandai chip yang sedang ditekan
         chip.classList.add('active');
 
         const selectedTag = chip.getAttribute('data-cat');
@@ -331,6 +342,7 @@ chips.forEach(chip => {
         if (selectedTag === 'all') {
             renderArticles(articles);
         } else {
+            // 3. Filter aman dengan pengecekan array tags
             const filtered = articles.filter(item => 
                 item.tags && item.tags.includes(selectedTag)
             );
@@ -338,6 +350,7 @@ chips.forEach(chip => {
         }
     });
 });
+
     </script>
 </body>
 </html>
