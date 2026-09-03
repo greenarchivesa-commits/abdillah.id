@@ -38,7 +38,7 @@ CSS */
     justify-content: center;
     margin: 15px 0 25px 0;
     flex-wrap: wrap;
-    padding-left: 2ch;
+    padding-left: 1.5ch;
 }
 
 .chip {
@@ -60,29 +60,30 @@ CSS */
 
 /* BIAR TAGS NNYA BISA DI GESER KALAU HP */
 
+/* Sembunyikan scrollbar bawaan biar tetap kelihatan minimalis */
+
 .category-filters {
     display: flex;
+    flex-wrap: nowrap;         /* KUNCI UTAMA: Larang keras pindah ke baris bawah */
     gap: 8px;
-    justify-content: flex-start; /* Rata kiri biar gampang di-swipe dari awal */
     margin: 15px 0 25px 0;
     overflow-x: auto;          /* Bikin bisa digeser ke samping */
-    white-space: nowrap;       /* Larang teks chip turun baris */
-    padding-bottom: 6px;       /* Ruang sikit buat scrollbar tipis */
-    -webkit-overflow-scrolling: touch; /* Supaya smooth di HP */
+    white-space: nowrap;       /* Pastikan teks chip tidak turun baris */
+    padding-bottom: 6px;       
+    -webkit-overflow-scrolling: touch; 
 }
 
-/* Sembunyikan scrollbar bawaan biar tetap kelihatan minimalis */
+/* Sembunyikan scrollbar bawaan */
 .category-filters::-webkit-scrollbar {
     display: none;             
 }
 .category-filters {
-    scrollbar-width: none;     /* Untuk Firefox */
+    scrollbar-width: none;     
 }
 
 .chip {
-    flex-shrink: 0;            /* Cegah chip ikut gepeng/penyok pas layarnya kecil */
+    flex-shrink: 0;            /* Cegah chip ikut gepeng di HP */
 }
-
 
 
 </style>
