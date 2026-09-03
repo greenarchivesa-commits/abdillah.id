@@ -71,8 +71,9 @@ CSS */
 
 
 	    <!-- CHAT & FORUM -->
-<section class="comments-section" style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+<section class="comments-section" style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border-color); margin-bottom: 30px;">
     <h3>Komentar & Diskusi</h3>
+    <br><br>
 <script src="https://giscus.app/client.js"
         data-repo="greenarchivesa-commits/abdillah.id"
         data-repo-id="R_kgDOUL2u_A"
@@ -89,6 +90,39 @@ CSS */
         async>
 </script>
 </section>
+
+<!-- Tempat penampung komentar -->
+<div id="giscus-container"></div>
+
+<script>
+    function loadGiscus() {
+        // Hapus elemen Giscus yang lama kalau ada, biar gak numpuk
+        const container = document.getElementById('giscus-container');
+        container.innerHTML = '';
+
+        // Bikin elemen script baru secara dinamis
+        const script = document.createElement('script');
+        script.src = "https://giscus.app/client.js";
+        script.setAttribute("data-repo", "greenarchivesa-commits/abdillah.id");
+        script.setAttribute("data-repo-id", "R_kgDOUL2u_A");
+        script.setAttribute("data-category", "General"); // Sesuaikan nama kategori lu
+        script.setAttribute("data-category-id", "DIC_kwDOUL2u_M4DEw-X"); // Masukin ID kategori lu yg bener
+        script.setAttribute("data-mapping", "pathname");
+        script.setAttribute("data-strict", "0");
+        script.setAttribute("data-reactions-enabled", "1");
+        script.setAttribute("data-emit-metadata", "1");
+        script.setAttribute("data-input-position", "top");
+        script.setAttribute("data-theme", "preferred_color_scheme");
+        script.setAttribute("data-lang", "id");
+        script.crossOrigin = "anonymous";
+        script.async = true;
+
+        container.appendChild(script);
+    }
+
+    // Jalankan fungsi saat halaman pertama kali dibuka
+    window.addEventListener('DOMContentLoaded', loadGiscus);
+</script>
 
         </div>
 

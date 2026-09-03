@@ -38,6 +38,7 @@ CSS */
     justify-content: center;
     margin: 15px 0 25px 0;
     flex-wrap: wrap;
+    padding-left: 2ch;
 }
 
 .chip {
@@ -83,40 +84,6 @@ CSS */
 }
 
 
-/* KODE BARU */
-
-.category-filters {
-    display: flex;
-    gap: 8px;
-    margin: 15px 0 25px 0;
-    overflow-x: auto;
-    white-space: nowrap;
-    padding-bottom: 6px;
-    -webkit-overflow-scrolling: touch;
-    
-    /* Trik biar di layar lebar dia di tengah, tapi di HP bisa digeser rata kiri */
-    justify-content: center; 
-}
-
-/* Kalau di HP (layar kecil), otomatis paksa rata kiri biar gak aneh posisinya */
-@media (max-width: 768px) {
-    .category-filters {
-        justify-content: flex-start;
-        padding-left: 16px; /* Kasih jarak sikit dari pinggir layar HP */
-        padding-right: 16px;
-    }
-}
-
-.category-filters::-webkit-scrollbar {
-    display: none;
-}
-.category-filters {
-    scrollbar-width: none;
-}
-
-.chip {
-    flex-shrink: 0;
-}
 
 </style>
 
